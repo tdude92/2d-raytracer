@@ -80,8 +80,6 @@ for i in pillars:
                 # Calculate point of intersection if the ray has an undefined slope.
                 poi_x = r_ep[0]
                 poi_y = s_m*poi_x + s_b
-            else:
-                raise ValueError
         else:
             # Calculate point of intersection x-value if slopes are not undefined.
             poi_x = (s_b - r_b) / (r_m - s_m)
