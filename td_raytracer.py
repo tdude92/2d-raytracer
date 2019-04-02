@@ -33,15 +33,13 @@ lsc_y = (lsy0 + lsy1) / 2
 # Create 360 rays of light.
 # Use sin and cos to calculate x and y displacement from light source center to x1 and y1.
 rays = []
-for i in range(361):
+for i in range(1, 361):
     x_displacement = 400 * cos(radians(i)) # adj = hyp*cos(x)
     y_displacement = 400 * sin(radians(i)) # opp = hyp*sin(x)
     rays.append(canvas.create_line(lsc_x, lsc_y, lsc_x + x_displacement, lsc_y + y_displacement, fill = "yellow"))
 
 # Detect light rays that overlap with pillar sides and create a new line from the light source to the point of intersection (of the pillar side and light ray).
-counter = 0
 for i in pillars:
-    counter += 1
     obstructed_rays_with_imposters = list(canvas.find_overlapping(*canvas.coords(i)))
 
     # Weed out imposter pillars.
