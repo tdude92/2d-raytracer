@@ -1,32 +1,24 @@
 import tkinter
 from math import sin, cos, radians
-from time import sleep
 
-# Light Source Coordinates
-lsx0 = 195
-lsy0 = 195
-lsx1 = 205
-lsy1 = 205
+def create_rays(pillars, lsc_x, lsc_y):
+    """
+    Arguments: List of pillar IDs; Light source center coords: x and y.
 
-def create_rays(lsc_x, lsc_y):
+    Function: Create rays that are obstructed by pillar walls.
+
+    Returns: A list of ray IDs.
+    """
+
     # Create 360 rays of light.
-    # Input: Light source center x and y coords.
-    # Returns: A list of line IDs.
     # Use sin and cos to calculate x and y displacement from light source center to x1 and y1.
     rays = []
-    for i in range(721):
-        x_displacement = 400 * cos(radians(i/2)) # adj = hyp*cos(x)
-        y_displacement = 400 * sin(radians(i/2)) # opp = hyp*sin(x)
+    for i in range(1, 361):
+        x_displacement = 400 * cos(radians(i)) # adj = hyp*cos(x)
+        y_displacement = 400 * sin(radians(i)) # opp = hyp*sin(x)
         rays.append(canvas.create_line(lsc_x, lsc_y, lsc_x + x_displacement, lsc_y + y_displacement, fill = "yellow"))
-    return rays
 
-
-def calculate_obstructions(pillars, lsc_x, lsc_y):
     # Detect light rays that overlap with pillar sides and create a new line from the light source to the point of intersection (of the pillar side and light ray).
-    # Input: List of pillar sides, Light source center x and y coords.
-    # Returns: None.
-    global rays
-
     for i in pillars:
         obstructed_rays_with_imposters = list(canvas.find_overlapping(*canvas.coords(i)))
 
@@ -68,9 +60,6 @@ def calculate_obstructions(pillars, lsc_x, lsc_y):
                     # Calculate point of intersection if the ray has an undefined slope.
                     poi_x = r_ep[0]
                     poi_y = s_m*poi_x + s_b
-                else:
-                    poi_x = lsc_x
-                    poi_y = lsc_y
             else:
                 # Calculate point of intersection x-value if slopes are not undefined.
                 poi_x = (s_b - r_b) / (r_m - s_m)
@@ -81,114 +70,14 @@ def calculate_obstructions(pillars, lsc_x, lsc_y):
             canvas.delete(j)
             rays.append(canvas.create_line(lsc_x, lsc_y, poi_x, poi_y, fill = "yellow"))
 
-
-def del_rays(rays):
-    out = rays
-    for i in out:
-        canvas.delete(i)
-        out.remove(i)
-    return out
-
-def del_ls(light_source):
-    canvas.remove(light_source)
-
-
-def move_ls(direction, rays, light_source):
-    global lsx0
-    global lsy0
-    global lsx1
-    global lsy1
-
-    if direction == 1:
-        # Up
-        lsy0 -= 10
-        lsy1 -= 10
-    elif direction == 2:
-        # Down
-        lsy0 += 10
-        lsy1 += 10
-    elif direction == 3:
-        # Left
-        lsx0 -= 10
-        lsx1 -= 10
-    elif direction == 4:
-        # Right
-        lsx0 += 10
-        lsx1 += 10
-
-
-# Event Handlers (For Moving)
-def up(event):
-    move_ls(1, rays, light_source)
-
-    del_rays(rays)
-    del_ls(light_source)
-
-    lsc_x = (lsx0 + lsx1) / 2
-    lsc_y = (lsy0 + lsy1) / 2
-
-    create_rays(lsc_x, lsc_y)
-    calculate_obstructions(pillars, lsc_x, lsc_y)
-
-    light_source = canvas.create_oval(lsx0, lsy0, lsx1, lsy1, fill = "white", outline = "yellow")
-
-
-def down(event):
-    move_ls(2, rays, light_source)
-
-    del_rays(rays)
-    del_ls(light_source)
-
-    lsc_x = (lsx0 + lsx1) / 2
-    lsc_y = (lsy0 + lsy1) / 2
-
-    create_rays(lsc_x, lsc_y)
-    calculate_obstructions(pillars, lsc_x, lsc_y)
-
-    light_source = canvas.create_oval(lsx0, lsy0, lsx1, lsy1, fill = "white", outline = "yellow")
-
-
-def left(event):
-    move_ls(3, rays, light_source)
-
-    del_rays(rays)
-    del_ls(light_source)
-
-    lsc_x = (lsx0 + lsx1) / 2
-    lsc_y = (lsy0 + lsy1) / 2
-
-    create_rays(lsc_x, lsc_y)
-    calculate_obstructions(pillars, lsc_x, lsc_y)
-
-    light_source = canvas.create_oval(lsx0, lsy0, lsx1, lsy1, fill = "white", outline = "yellow")
-
-
-def right(event):
-    move_ls(4, rays, light_source)
-
-    del_rays(rays)
-    del_ls(light_source)
-
-    lsc_x = (lsx0 + lsx1) / 2
-    lsc_y = (lsy0 + lsy1) / 2
-
-    create_rays(lsc_x, lsc_y)
-    calculate_obstructions(pillars, lsc_x, lsc_y)
-
-    light_source = canvas.create_oval(lsx0, lsy0, lsx1, lsy1, fill = "white", outline = "yellow")
+    return rays
 
 
 if __name__ == "__main__":
     root = tkinter.Tk()
 
-    canvas = tkinter.Canvas(root, width = 400, height = 400, bg = "black")
+    canvas = tkinter.Canvas(root, width = 400, height = 400)
     canvas.pack()
-
-    # Bind Key Events to Handlers (For Moving)
-    canvas.bind("w", up)
-    canvas.bind("s", down)
-    canvas.bind("a", left)
-    canvas.bind("d", right)
 
     # Draw the sides of the pillars.
     # Not rectangles because we want to know which side the rays intersects with.
@@ -205,15 +94,9 @@ if __name__ == "__main__":
         y0 += 100
 
     # Light Source Center Coordinates
-    lsc_x = (lsx0 + lsx1) / 2
-    lsc_y = (lsy0 + lsy1) / 2
+    lsc_x = 200
+    lsc_y = 200
 
-    # Draw the rays
-    rays = create_rays(lsc_x, lsc_y)
-
-    # Calculate obstructions
-    calculate_obstructions(pillars, lsc_x, lsc_y)
-
-    light_source = canvas.create_oval(lsx0, lsy0, lsx1, lsy1, fill = "white", outline = "yellow")
+    rays = create_rays(pillars, lsc_x, lsc_y)
 
     tkinter.mainloop()
