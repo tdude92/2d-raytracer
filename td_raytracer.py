@@ -1,5 +1,7 @@
 import tkinter
 from math import sin, cos, radians
+from random import randint
+from time import sleep
 
 def create_rays(pillars, lsc_x, lsc_y):
     """
@@ -93,10 +95,39 @@ if __name__ == "__main__":
             x0 += 100
         y0 += 100
 
-    # Light Source Center Coordinates
+    # Light Source Center Coordinates.
     lsc_x = 200
     lsc_y = 200
 
-    rays = create_rays(pillars, lsc_x, lsc_y)
+    # Pick a random number to be the angle that the light source will go.
+    ls_angle = randint(0, 360) # Change this to change where the light source goes.
 
-    tkinter.mainloop()
+    # Detect if an are around lsc is colliding with a pillar. If true, change the angle accordingly (using the Law of Reflection). If false, do nothing. 
+    # Then move the lsc a bit before repeating.
+    def animation(lsc_x, lsc_y):
+        # Create Rays.
+        rays = create_rays(pillars, lsc_x, lsc_y)
+
+        collisions = canvas.find_overlapping(lsc_x - 5, lsc_y - 5, lsc_x + 5, lsc_y + 5)
+
+        # Check if the lamp is overlapping with a pillar side.
+        if collisions:
+            pass
+        
+        # Find the x and y displacements of the lamp.
+        ls_xd = 5 * cos(radians(ls_angle)) # Light Source x-displacement.
+        ls_yd = 5 * sin(radians(ls_angle)) # Light Source y-displacement.
+
+        # Delete Rays.
+        for i in rays:
+            canvas.delete(i)
+
+        # Move light source centers and the lamp.
+        lsc_x += ls_xd
+        lsc_y -= ls_yd
+
+        root.after_idle(animation, lsc_x, lsc_y)
+
+    animation(lsc_x, lsc_y)
+
+    root.mainloop()
