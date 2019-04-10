@@ -126,6 +126,9 @@ if __name__ == "__main__":
         lsc_x += ls_xd
         lsc_y -= ls_yd
 
+        canvas.update()
+        canvas.after(20)
+
         root.after_idle(animation, lsc_x, lsc_y)
 
     animation(lsc_x, lsc_y)
